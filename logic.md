@@ -3,20 +3,48 @@ flowchart TD
 terminalStart([Start])
 terminalEnd([End])
 terminalStart --> thresholdSet(distanceThreshold = 100)
-thresholdSet --> PiezoPin=8
+thresholdSet --> ReadValueFromSensor
+-->
+PotenitometerSetPortionSize
 -->
 ifDistanceLessThanThreshold{ReadDistanceThreshold} 
 ifDistanceLessThanThreshold --> |False| ReturntoDistanceThreshold
 ifDistanceLessThanThreshold --> |True| ReadLinesensor 
---> 
-IfLineSensorActive{ReadLinesensor}
-IfLineSensorActive --> |False| ReturntoDistanceThreshold
-IfLineSensorActive --> |True| ServoMotor=DigitalWriteHIGH
---> PiezoBuzzer=DigitalWriteHIGH
---> LEDPin=HIGH
+--> terminalEnd([End])
+```
+
+``` mermaid
+flowchart TD
+terminalStart([Start])
+terminalEnd([End])
+terminalStart --> BothSensorsTrue
+--> TurnONMotor
+--> TurnONPiezo
+--> TurnONLED
 -->
 ButtonActivate{ReadButton}
-ButtonActiavte --> |True| ServoMotor=HIGH 
-ButtonActivate --> |False| ReturntoDistanceThreshold
+ButtonActivate --> |True| ActivateMotor
+ButtonActivate --> |False| KeepMotorOff
+-->terminalEnd
 
 ```
+
+``` mermaid
+flowchart TD
+terminalStart([Start Loop])
+terminalStart([Start Loop])
+-->
+DistanceSensor
+--> Potenitometer
+--> LineSensor
+```
+
+``` mermaid
+flowchart TD
+terminalStart([Start Loop])
+terminalStart([Start Loop])
+-->
+ServoMotor
+--> PiezoBuzzer
+--> LED
+--> Button
