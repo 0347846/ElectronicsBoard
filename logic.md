@@ -20,10 +20,11 @@ Behaviour 2. When Fish feeder active activate motor to drop food in tank and ale
 flowchart TD
 terminalStart([Start])
 terminalEnd([End])
-terminalStart --> BothSensorsTrue
---> TurnONMotor
---> TurnONPiezo
---> TurnONLED
+terminalStart --> BothSensorsTrue{Sonar + Line = True}
+BothSensorsTrue --> |False| Return(Return To ReadDistanceThreshold)
+BothSensorsTrue --> |True| MotorON(Wirte HIGH to Motor)
+--> PiezoOn(Write HIGH to Piezo)
+--> LedON(Write HIGH LED)
 --> terminalEnd([End])
 ```
 
@@ -33,8 +34,8 @@ flowchart TD
 terminalStart([Start])
 terminalEnd([End])
 terminalStart --> ButtonActivate{ReadButton}
-ButtonActivate --> |True| ActivateMotor
-ButtonActivate --> |False| KeepMotoroff
+ButtonActivate --> |True| Motor(Write HIGH to Motor)
+ButtonActivate --> |False| Motoroff(Write LOW to Motor)
 -->terminalEnd
 ```
 Sensor Loop
@@ -44,9 +45,9 @@ terminalStart([Start Loop])
 terminalEnd([End])
 terminalStart([Start Loop])
 -->
-DistanceSensor
+ReadDistanceSensor
 --> Potenitometer
---> LineSensor
+--> ReadLinesesor
 --> terminalEnd
 ```
 
