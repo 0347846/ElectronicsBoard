@@ -1,15 +1,43 @@
 //Sd Card module
 #include <SPI.h>
 #include <SD.h>
-
-//Real time clock (RTC)
+#include <L298N.h>
+#include <Servo.h>
+Servo myservo;
 #include "RTClib.h"
 RTC_Millis rtc; 
 DateTime rightNow;
+#define pot A3
+#define ledRed A0
+#define ledYellow A1 
+#define ledGreen A2
+#define piezoPin 8
+#define lineSensorPin 3
+#define crashSensor 7
+// DC Motor & Motor Module - L298N
+#include <L298N.h>
+#define echoPin 4 
+#define trigPin 5
+// Pin definition
+const unsigned int IN1 = 7;
+const unsigned int IN2 = 8;
+const unsigned int EN = 9;
 
+L298N motor(EN, IN1, IN2);
 
 
 void setup() {
+  pinMode(ledRed, OUTPUT);
+pinMode(ledYellow, OUTPUT);
+pinMode(ledGreen, OUTPUT);
+motor.setSpeed(70);
+ myservo.attach(9);
+ pinMode(pot, INPUT);
+ pinMode(piezoPin,OUTPUT);
+ pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
+pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+pinMode(lineSensorPin, OUTPUT);
+pinMode(crashSensor, INPUT);
  Serial.begin(9600);           // Open serial communications and wait for port to open:
   while (!Serial) {
     delay(1);                   // wait for serial port to connect. Needed for native USB port only
@@ -29,7 +57,6 @@ logEvent("System Initialisation...");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
 }
 
