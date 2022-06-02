@@ -22,12 +22,13 @@ DateTime rightNow;
 const unsigned int IN1 = 7;
 const unsigned int IN2 = 8;
 const unsigned int EN = 9;
-
+long duration;
+int distance;
 L298N motor(EN, IN1, IN2);
 
 
 void setup() {
-  pinMode(ledRed, OUTPUT);
+pinMode(ledRed, OUTPUT);
 pinMode(ledYellow, OUTPUT);
 pinMode(ledGreen, OUTPUT);
 motor.setSpeed(70);
@@ -38,7 +39,9 @@ motor.setSpeed(70);
 pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
 pinMode(lineSensorPin, OUTPUT);
 pinMode(crashSensor, INPUT);
- Serial.begin(9600);           // Open serial communications and wait for port to open:
+ Serial.begin(9600);   
+ Serial.println("Ultrasonic Sensor HC-SR04 Test");
+ Serial.println("with Arduino UNO R3");
   while (!Serial) {
     delay(1);                   // wait for serial port to connect. Needed for native USB port only
   }
@@ -58,6 +61,38 @@ logEvent("System Initialisation...");
 
 void loop() {
 
+FishFeeder(); // Sonar, Line sensor, Pot and DC Motor
+CompletionAlarm(); // Piezo and LED
+ManualFeeder();// Button
+}
+
+/* When someone arrives in the drive way (sonar) and light is detected inside the house (Line Sensor) the Fish feeder will automatically activate itself (DC Motor) adjust the portion size (Potentiometer)
+ * 
+ */
+void FishFeeder() {
+   digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+}
+
+/*
+ * When the Feeder is active alert the completition with a green light (LED) and a buzzer (Piezo Buzzer)
+ */
+void CompletionAlarm() {
+  
+}
+/*
+ * A button can be pressed to manually activate the feeder (Button) if needed
+ */
+void ManualFeeder(){
+  
 }
 
 void logEvent(String dataToLog) {
