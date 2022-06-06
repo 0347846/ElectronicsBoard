@@ -24,6 +24,7 @@ const unsigned int IN2 = 8;
 const unsigned int EN = 9;
 long duration;
 int distance;
+int buttonState = 0; 
 L298N motor(EN, IN1, IN2);
 
 
@@ -38,10 +39,10 @@ motor.setSpeed(70);
  pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
 pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
 pinMode(lineSensorPin, OUTPUT);
-pinMode(crashSensor, INPUT);
- Serial.begin(9600);   
+pinMode(crashSensor, INPUT);  
  Serial.println("Ultrasonic Sensor HC-SR04 Test");
  Serial.println("with Arduino UNO R3");
+Serial.begin(9600);           // Open serial communications and wait for port to open:
   while (!Serial) {
     delay(1);                   // wait for serial port to connect. Needed for native USB port only
   }
@@ -86,13 +87,21 @@ void FishFeeder() {
  * When the Feeder is active alert the completition with a green light (LED) and a buzzer (Piezo Buzzer)
  */
 void CompletionAlarm() {
-  
 }
+
 /*
  * A button can be pressed to manually activate the feeder (Button) if needed
  */
 void ManualFeeder(){
-  
+
+  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+  if (crashSensor == HIGH) {
+    // turn LED on:
+    digitalWrite(ledGreen, HIGH);
+  } else {
+    // turn LED off:
+    digitalWrite(ledGreen, LOW);
+  }
 }
 
 void logEvent(String dataToLog) {
