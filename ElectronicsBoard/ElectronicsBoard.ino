@@ -26,8 +26,7 @@ long duration;
 int distance;
 int buttonState = 0; 
 L298N motor(EN, IN1, IN2);
-
-
+int val;
 void setup() {
 pinMode(ledRed, OUTPUT);
 pinMode(ledYellow, OUTPUT);
@@ -56,15 +55,12 @@ Serial.begin(9600);           // Open serial communications and wait for port to
 // Real Time Clock (RTC)
   rtc.begin(DateTime(F(__DATE__), F(__TIME__)));
   Serial.println("initialization done.");
-logEvent("System Initialisation...");
 
 }
 
 void loop() {
 
-FishFeeder(); // Sonar, Line sensor, Pot and DC Motor
-CompletionAlarm(); // Piezo and LED
-ManualFeeder();// Button
+
 }
 
 /* When someone arrives in the drive way (sonar) and light is detected inside the house (Line Sensor) the Fish feeder will automatically activate itself (DC Motor) adjust the portion size (Potentiometer)
@@ -87,22 +83,21 @@ void FishFeeder() {
  * When the Feeder is active alert the completition with a green light (LED) and a buzzer (Piezo Buzzer)
  */
 void CompletionAlarm() {
-}
+
 
 /*
  * A button can be pressed to manually activate the feeder (Button) if needed
  */
 void ManualFeeder(){
+ val = digitalRead (crashSensor); // digital interface will be assigned a value of 12 to read val
+if (val == LOW) // When a collision sensor detects a signal, LED flashes
+{digitalWrite (ledGreen, HIGH);
+delay(100);}
+else
+{digitalWrite (ledGreen, LOW);}
 
-  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if (crashSensor == HIGH) {
-    // turn LED on:
-    digitalWrite(ledGreen, HIGH);
-  } else {
-    // turn LED off:
-    digitalWrite(ledGreen, LOW);
-  }
 }
+
 
 void logEvent(String dataToLog) {
   /*
