@@ -5,18 +5,16 @@
 #include <Servo.h>
 Servo myservo;
 #include "RTClib.h"
-RTC_Millis rtc; 
+RTC_Millis rtc;
 DateTime rightNow;
 #define pot A3
 #define ledRed A0
-#define ledYellow A1 
-#define ledGreen A2
+#define ledYellow A1
 #define piezoPin 8
 #define lineSensorPin 3
-#define crashSensor 7
 // DC Motor & Motor Module - L298N
 #include <L298N.h>
-#define echoPin 4 
+#define echoPin 4
 #define trigPin 5
 // Pin definition
 const unsigned int IN1 = 7;
@@ -24,35 +22,37 @@ const unsigned int IN2 = 8;
 const unsigned int EN = 9;
 long duration;
 int distance;
-int buttonState = 0; 
+int buttonState = 0;
 L298N motor(EN, IN1, IN2);
-int val;
+#define crashSensor 7
+const int LED = A2;
+int BUTTONstate = 0;
 void setup() {
-pinMode(ledRed, OUTPUT);
-pinMode(ledYellow, OUTPUT);
-pinMode(ledGreen, OUTPUT);
-motor.setSpeed(70);
- myservo.attach(9);
- pinMode(pot, INPUT);
- pinMode(piezoPin,OUTPUT);
- pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
-pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
-pinMode(lineSensorPin, OUTPUT);
-pinMode(crashSensor, INPUT);  
- Serial.println("Ultrasonic Sensor HC-SR04 Test");
- Serial.println("with Arduino UNO R3");
-Serial.begin(9600);           // Open serial communications and wait for port to open:
+  pinMode(ledRed, OUTPUT);
+  pinMode(ledYellow, OUTPUT);
+  pinMode(LED, OUTPUT);
+  motor.setSpeed(70);
+  myservo.attach(9);
+  pinMode(pot, INPUT);
+  pinMode(piezoPin, OUTPUT);
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
+  pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+  pinMode(lineSensorPin, OUTPUT);
+  pinMode(crashSensor, INPUT);
+  Serial.println("Ultrasonic Sensor HC-SR04 Test");
+  Serial.println("with Arduino UNO R3");
+  Serial.begin(9600);           // Open serial communications and wait for port to open:
   while (!Serial) {
     delay(1);                   // wait for serial port to connect. Needed for native USB port only
   }
 
-// SD Card initialisation
+  // SD Card initialisation
   Serial.print("Initializing SD card...");
   if (!SD.begin(10)) {
     Serial.println("initialization failed!");
     while (1);
   }
-// Real Time Clock (RTC)
+  // Real Time Clock (RTC)
   rtc.begin(DateTime(F(__DATE__), F(__TIME__)));
   Serial.println("initialization done.");
 
@@ -64,10 +64,10 @@ void loop() {
 }
 
 /* When someone arrives in the drive way (sonar) and light is detected inside the house (Line Sensor) the Fish feeder will automatically activate itself (DC Motor) adjust the portion size (Potentiometer)
- * 
- */
+
+*/
 void FishFeeder() {
-   digitalWrite(trigPin, LOW);
+  digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
@@ -77,25 +77,37 @@ void FishFeeder() {
   Serial.print("Distance: ");
   Serial.print(distance);
   Serial.println(" cm");
+  int lineSensorValue = digitalRead(lineSensorPin);
 }
 
 /*
- * When the Feeder is active alert the completition with a green light (LED) and a buzzer (Piezo Buzzer)
- */
+   When the Feeder is active alert the completition with a green light (LED) and a buzzer (Piezo Buzzer)
+*/
 void CompletionAlarm() {
 
+motor.forward();
+delay(1000);
+motor.stop();
+delay(1000);
+motor.backward();
+delay(1000);
+tone(piezoPin, 1000); // Send 1KHz sound signal...
+delay(100);
+noTone(piezoPin);
 
+}
 /*
- * A button can be pressed to manually activate the feeder (Button) if needed
- */
-void ManualFeeder(){
- val = digitalRead (crashSensor); // digital interface will be assigned a value of 12 to read val
-if (val == LOW) // When a collision sensor detects a signal, LED flashes
-{digitalWrite (ledGreen, HIGH);
-delay(100);}
-else
-{digitalWrite (ledGreen, LOW);}
-
+   A button can be pressed to manually activate the feeder (Button) if needed
+*/
+void ManualFeeder() {
+ int crashSensorValue = digitalRead(crashSensor);
+  if (crashSensorValue == HIGH)
+  {
+    digitalWrite(LED, HIGH);
+  }
+  else {
+    digitalWrite(LED, LOW);
+  }
 }
 
 
